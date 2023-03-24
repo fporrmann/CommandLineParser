@@ -39,6 +39,11 @@
 #include <libgen.h>
 #endif
 
+/**
+ * TODO:
+ *  - Currently, when an option is required there is no way to implement direct exit options like version
+ * **/
+
 class CommandLineOption
 {
 public:
