@@ -361,9 +361,9 @@ private:
 #ifdef _WIN32
 		char drive[_MAX_DRIVE];
 		char dir[_MAX_DIR];
-		char fileName[_MAX_FNAME];
+		char pFileName[_MAX_FNAME];
 		char ext[_MAX_EXT];
-		_splitpath_s(m_argv[0], drive, dir, fileName, ext);
+		_splitpath_s(m_argv[0], drive, dir, pFileName, ext);
 #else
 		char* pFileName = basename(m_argv[0]);
 #endif
