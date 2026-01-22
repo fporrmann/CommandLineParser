@@ -1,19 +1,19 @@
-/* 
+/*
  *  File: CommandLineParser.h
  *  Copyright (c) 2023 Florian Porrmann
- *  
+ *
  *  MIT License
- *  
+ *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
  *  in the Software without restriction, including without limitation the rights
  *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *  copies of the Software, and to permit persons to whom the Software is
  *  furnished to do so, subject to the following conditions:
- *  
+ *
  *  The above copyright notice and this permission notice shall be included in all
  *  copies or substantial portions of the Software.
- *  
+ *
  *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -21,7 +21,7 @@
  *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  *  SOFTWARE.
- *  
+ *
  */
 
 #pragma once
@@ -261,16 +261,28 @@ class CommandLineParser
 	using CommandLineOptions = std::deque<CommandLineOption>;
 
 public:
-	CommandLineParser(const int argc, char** argv) :
+	CommandLineParser(const int argc, char** argv, const std::string& programName = "", const std::string& programVersion = "") :
 		m_options(),
 		m_argc(argc),
 		m_argv(argv),
-		m_helpOpt(CommandLineOption("-h", "--help", "Displays Help", CLO::HasValue::No))
+		m_programName(programName),
+		m_programVersion(programVersion)
 	{
 	}
 
-	CommandLineParser(const CommandLineParser&) = delete;            // disable copy constructor
+	CommandLineParser(const CommandLineParser&)            = delete; // disable copy constructor
 	CommandLineParser& operator=(const CommandLineParser&) = delete; //  disable assignment constructor
+
+	void addVersionOption()
+	{
+		m_options.push_back(m_verOpt);
+	}
+
+	void addVersionOption(const CommandLineOption& versionOpt)
+	{
+		m_verOpt = versionOpt;
+		addVersionOption();
+	}
 
 	void addOption(const CommandLineOption& opt)
 	{
@@ -314,6 +326,12 @@ public:
 		if (isSet(m_helpOpt) || (!anyMatch && requireMatch))
 		{
 			printHelp();
+			exit(0);
+		}
+
+		if (isSet(m_verOpt))
+		{
+			printVersion();
 			exit(0);
 		}
 
@@ -381,6 +399,22 @@ private:
 			std::cout << option;
 	}
 
+	void printVersion()
+	{
+		if (!m_programName.empty())
+			std::cout << m_programName;
+
+		if (!m_programVersion.empty())
+		{
+			if (!m_programName.empty())
+				std::cout << " - ";
+
+			std::cout << m_programVersion;
+		}
+
+		std::cout << std::endl;
+	}
+
 	void updateAddSpaces()
 	{
 		// Find the element with the largest argument length and use that length as the max length
@@ -411,5 +445,8 @@ private:
 	CommandLineOptions m_options;
 	int m_argc;
 	char** m_argv;
-	CommandLineOption m_helpOpt;
+	std::string m_programName;
+	std::string m_programVersion;
+	CommandLineOption m_helpOpt = CommandLineOption("-h", "--help", "Displays Help", CLO::HasValue::No);
+	CommandLineOption m_verOpt  = CommandLineOption("-v", "--version", "Print the version", CLO::HasValue::No);
 };
