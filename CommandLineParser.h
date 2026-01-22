@@ -315,6 +315,13 @@ public:
 					if (option.hasValue())
 					{
 						i++;
+
+						if (i >= m_argc)
+						{
+							std::cerr << "ERROR: Option (" << option.getArg() << " / " << option.getArgAlt() << ") requires a value, but none was provided, exiting ..." << std::endl;
+							exit(-1);
+						}
+
 						option.setValue(m_argv[i]);
 					}
 
